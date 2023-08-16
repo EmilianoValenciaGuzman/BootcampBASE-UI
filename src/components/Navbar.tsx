@@ -27,13 +27,13 @@ export const Navbar = () => {
 		{ name: "Inicio", href: "/", current: pathname === "/" },
 		{
 			name: "Clientes",
-			href: "/clients",
-			current: pathname === "/clients",
+			href: "/customers",
+			current: pathname === "/customers",
 		},
 		{
 			name: "Divisas",
-			href: "/currencies",
-			current: pathname === "/currencies",
+			href: "/currency",
+			current: pathname === "/currency",
 		},
 	];
 

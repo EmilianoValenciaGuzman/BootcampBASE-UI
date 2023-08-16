@@ -17,15 +17,15 @@ const router = createBrowserRouter([
 				element: <Dashboard />,
 			},
 			{
-				path: "clients",
+				path: "customers",
 				element: <Clients />,
 			},
 			{
-				path: "clients/:id",
+				path: "customers/:id",
 				element: <Client />,
 			},
 			{
-				path: "currencies",
+				path: "currency",
 				element: <Currencies />,
 			},
 		],

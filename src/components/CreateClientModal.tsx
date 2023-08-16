@@ -1,14 +1,46 @@
+import { FormEvent, useState } from "react";
 import { Modal } from ".";
+import { httpClient } from "../http";
+import { ClientDTO } from "../interfaces";
+
 
 interface Props {
 	isOpen: boolean;
 	onClose: () => void;
+	mutateInfoClients: () => void;
 }
 
-export const CreateClientModal = ({ isOpen, onClose }: Props) => {
+export const CreateClientModal = ({ isOpen, onClose, mutateInfoClients}: Props) => {
+
+	const [info, setInfo] = useState({
+		name: "",
+		curp: "",
+		gender: "",
+		birthdate: ""
+	});
+
+	const onSubmit = async (e: FormEvent) => {
+		e.preventDefault();
+
+		await httpClient.post<ClientDTO>("customers",{...info});
+
+		onClose();
+
+
+		setInfo({
+			name: "",
+			curp: "",
+			gender: "",
+			birthdate: ""
+		});
+
+		mutateInfoClients();
+
+	}
+
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
-			<form>
+			<form onSubmit={onSubmit}>
 				<div className="mb-6">
 					<label
 						htmlFor="name"
@@ -23,6 +55,7 @@ export const CreateClientModal = ({ isOpen, onClose }: Props) => {
 						required
 						name="name"
 						type="text"
+						onChange={(e)=> setInfo({...info, name: e.target.value})}
 					/>
 				</div>
 				<div className="mb-6">
@@ -39,6 +72,7 @@ export const CreateClientModal = ({ isOpen, onClose }: Props) => {
 						required
 						name="curp"
 						type="text"
+						onChange={(e)=> setInfo({...info, curp: e.target.value})}
 					/>
 				</div>
 				<div className="mb-6">
@@ -53,7 +87,10 @@ export const CreateClientModal = ({ isOpen, onClose }: Props) => {
 						id="gender"
 						required
 						name="gender"
+						onChange={(e)=> setInfo({...info, gender: e.target.value})}
+						value={info.gender}
 					>
+						<option value="" disabled>Seleciona</option>
 						<option value="HOMBRE">Masculino</option>
 						<option value="MUJER">Femenino</option>
 					</select>
@@ -71,6 +108,7 @@ export const CreateClientModal = ({ isOpen, onClose }: Props) => {
 						required
 						name="birthdate"
 						type="date"
+						onChange={(e)=> setInfo({...info, birthdate: e.target.value})}
 					/>
 				</div>
 				<button

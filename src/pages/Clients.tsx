@@ -8,8 +8,10 @@ import {
 } from "../components";
 import { useEffect, useState } from "react";
 import { Client as IClient } from "../interfaces";
-import { clientsMock } from "../mocks";
+
 import { useToggle } from "../hooks";
+import { useGetCustomer } from "../api";
+import { FetchingData } from "../components/FetchingData";
 
 export const Clients = () => {
 	const [clients, setClients] = useState<IClient[]>([]);
@@ -23,10 +25,14 @@ export const Clients = () => {
 		{ label: "edad", value: "birthdate" },
 	];
 
+	const [search, setSearch] = useState("");
+	const {isError, isLoading, mutate} = useGetCustomer();
+	
 	useEffect(() => {
-		setClients(clientsMock);
-		setClients((prevState) => orderClients(prevState, currentOrderOption));
-	}, []);
+		mutate(search,{
+			onSuccess: (data) => setClients(data)
+		});
+	}, [search]);
 
 	const orderClients = (
 		clients: IClient[],
@@ -47,18 +53,24 @@ export const Clients = () => {
 		setClients(orderClients(clients, e.target.value));
 	};
 
-	const handleSearch = (searchWord: string) => {
-		if (searchWord === "") {
-			setClients(clientsMock);
-		} else {
-			let newClients = clientsMock.filter((client) => {
-				if (searchWord === client.customerId.toString()) {
-					return client;
-				}
-			});
-			setClients(newClients);
-		}
-	};
+	// const handleSearch = (searchWord: string) => {
+	// 	if (searchWord === "") {
+	// 		setClients(clientsMock);
+	// 	} else {
+	// 		let newClients = clientsMock.filter((client) => {
+	// 			if (searchWord === client.customerId.toString()) {
+	// 				return client;
+	// 			}
+	// 		});
+	// 		setClients(newClients);
+	// 	}
+	// };
+
+	const mutateInfoClients = () =>{
+		mutate(search,{
+			onSuccess: (data) => setClients(data)
+		})
+	}
 
 	return (
 		<>
@@ -67,6 +79,7 @@ export const Clients = () => {
 				onClose={() => {
 					setIsOpen();
 				}}
+				mutateInfoClients={mutateInfoClients}
 			/>
 
 			<Header>
@@ -81,7 +94,7 @@ export const Clients = () => {
 					/>
 					<SearchInput
 						Icon={IconUser}
-						onSearch={(e) => handleSearch(e.target.value)}
+						onSearch={(e) => setSearch(e.target.value)}
 						propertie="clientes"
 					>
 						<button
@@ -96,27 +109,15 @@ export const Clients = () => {
 			</Header>
 
 			<section className="flex flex-col items-center h-[calc(100vh-10rem)] mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-				<ul
-					role="list"
+			<FetchingData isLoading={isLoading} isError={isError}>
+				<ul role="list" 
 					className="my-4 overflow-auto divide-y divide-gray-100"
 				>
-					{clients.length === 0 ? (
-						<div className="flex flex-col items-center justify-center h-full">
-							<p className="text-3xl font-bold text-center">
-								¡Oh no! :(
-							</p>
-
-							<p className="mt-5 text-lg text-center">
-								Algo no ha salido como esperabamos. Por favor,
-								intentalo más tarde.
-							</p>
-						</div>
-					) : (
-						clients.map((client) => (
-							<Client client={client} key={client.customerId} />
-						))
-					)}
+					{clients.map((client) => (
+						<Client client={client} key={client.customerId} />
+					))}
 				</ul>
+			</FetchingData>
 			</section>
 		</>
 	);
